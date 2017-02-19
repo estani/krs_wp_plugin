@@ -1,2 +1,3 @@
 # krs_wp_plugin
-Wordpress plugin for Kunst Raum steglitz
+This is a basic plugin to add some short-codes to simplify some tipical uses.
+
