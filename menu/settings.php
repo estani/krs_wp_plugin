@@ -39,23 +39,18 @@ function krs_plugin_options_validate() {
 function krs_logo_section_text() {
   //Not required
 }
-function plugin_setting_string() {
-$options = get_option('options');
-$logo_id = $options['logo_id'];
-if ($logo_id == -1) {
-  $logo_url = KRS_LOGO;
-} else {
-  $logo_url = wp_get_attachment_url($logo_id);
-}
 
-wp_enqueue_media();
-//add_action( 'admin_enqueue_scripts', 'function_name' );
+function plugin_setting_string() {
+  //defined in kunstraump.php:krs_options
+  $logo = krs_options();
+  wp_enqueue_media();
+  //add_action( 'admin_enqueue_scripts', 'function_name' );
 
 ?>
 <div class='image-preview-wrapper'>
-		<img id='image-preview' src='<?php echo $logo_url; ?>'  height='100' style='max-height: 100px;'>
+		<img id='image-preview' src='<?php echo $logo['url']; ?>'  height='100' style='max-height: 100px;'>
 	</div>
-  <input type='hidden' name='options[logo_id]' id='image_attachment_id' value='<?php echo $logo_id; ?>'>
+  <input type='hidden' name='options[logo_id]' id='image_attachment_id' value='<?php echo $logo['id']; ?>'>
 	<input id="select_logo_button" style='width:180px;' type="button" class="button" value="<?php _e( 'Select Logo' ); ?>" />
   <input id="use_default_logo_button" type="button" class="button" value="<?php _e( 'Use Default Logo' ); ?>" />
   <?php
@@ -64,10 +59,8 @@ wp_enqueue_media();
 add_action( 'admin_footer', 'media_selector_print_scripts' );
 //add_action( 'admin_enqueue_scripts', 'media_selector_print_scripts' );
 function media_selector_print_scripts($hook) {
-
   //echo serialize($hook);
-  $options = get_option('options');
-  $my_saved_attachment_post_id = $options['logo_id'];
+  $logo = krs_options();
 
 	?><script type='text/javascript'>
 
@@ -75,7 +68,7 @@ function media_selector_print_scripts($hook) {
 
 			// Uploading files
 			var file_frame,
-        previous_logo_id = <?php echo $my_saved_attachment_post_id; ?>,
+        previous_logo_id = <?php echo $logo['id']; ?>,
         selected_logo_id = previous_logo_id; // Set this
 
       function newSelection(id, url) {
@@ -105,16 +98,13 @@ function media_selector_print_scripts($hook) {
   				// When an image is selected, run a callback.
   				file_frame.on( 'select', function() {
   					// We set multiple to false so only get one image from the uploader
-  					attachment = file_frame.state().get('selection').first().toJSON();
-  					// Do something with attachment.id and/or attachment.url here
-            newSelection(attachment.id, attachment.url)
-
+  					var attachment = file_frame.state().get('selection').first();
+            newSelection(attachment.get('id'), attachment.get('url'));
   				});
         }
 				// Finally, open the modal
 				file_frame.open();
 			});
-
 		});
 
 	</script><?php

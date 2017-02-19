@@ -18,6 +18,19 @@ define( 'KRS_LOGO',  KRS_PLUGIN_IMAGES_URL . "/logo.png");
 define( 'KRS_PINK_COLOR', '#ec048c');
 define( 'KRS_A_LETTER_STYLE','font-style:italic;color:' . KRS_PINK_COLOR);
 
+function krs_options () {
+	$options = get_option('options');
+	$logo_id = $options['logo_id'];
+	if ($logo_id == -1) {
+	  $logo_url = KRS_LOGO;
+	} else {
+	  $logo_url = wp_get_attachment_url($logo_id);
+	}
+	return [
+		"id" => $logo_id,
+		"url" => $logo_url
+	];
+}
 
 //[logo] - show KRS logo (default floating right)
 function logo_func( $atts ) {
@@ -25,7 +38,8 @@ function logo_func( $atts ) {
         	'position' => 'right'
     		), $atts );
 	$style = "float:{$a['position']};";
-	return "<div><img style=\"$style\"; src=\"" . KRS_LOGO . "\"/></div>";
+
+	return "<div><img style=\"$style\"; src=\"" . krs_options()['url'] . "\"/></div>";
 }
 add_shortcode( 'logo', 'logo_func' );
 
